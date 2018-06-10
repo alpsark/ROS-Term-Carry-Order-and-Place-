@@ -1,0 +1,70 @@
+<launch>
+  <master auto="start"/>
+  <param name="/use_sim_time" value="true" />
+  <arg name="map_file" default="/home/alpsark/ros-ws/src/nav_stack_tuning/launch/map.yaml"/>
+  <!-- Map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" >		
+    <param name="frame_id" value ="/map"/>
+  </node>
+
+  <remap from="map" to="/map"/>
+  <!--node name="rviz" pkg="rviz" type="rviz" output="screen" /-->	
+  <!--My packages -->
+
+	<group ns="/OmniPlatform001/">
+        <param name="tf_prefix" value="robot1_tf" />
+		<remap from="map" to="/map"/>
+		<param name = "amcl/initial_pose_x" value="0.0" />
+		<param name = "amcl/initial_pose_y" value="2.0" />
+		<param name = "amcl/base_frame_id" value="OmniPlatform001_base" />
+		<include file = "/home/alpsark/ros-ws/src/my_subsumption/launch/robot.launch" >
+			  <arg name = "robot_name" value="OmniPlatform001"/>
+			  <arg name = "scan_name" value="/OmniPlatform001/sensors/scan"/>			  
+		</include>
+
+		<node name="go_near_beacon" pkg="go_near_beacon" type="go_near_beacon" output="screen">
+			<param name="prefix" value ="/OmniPlatform001/"/>
+		</node>
+
+		<node name="deliver_order" pkg="deliver_order" type="deliver_order" output="screen">
+			<param name="prefix" value ="/OmniPlatform001/"/>
+		</node>
+
+		<node name="my_subsumption" pkg="my_subsumption" type="my_subsumption" output="screen" >
+			<param name="prefix" value ="/OmniPlatform001/"/>
+		</node>
+
+ </group>
+
+ <group ns="/OmniPlatform002/">
+        <param name="tf_prefix" value="robot2_tf" />
+		<remap from="map" to="/map"/>
+		<include file = "/home/alpsark/ros-ws/src/my_subsumption/launch/robot.launch" >
+		  <arg name = "robot_name" value="OmniPlatform002"/>
+		  <arg name = "scan_name" value="/OmniPlatform002/sensors/scan"/>
+		</include>
+
+			<param name = "amcl/initial_pose_x" value="1.0" />
+			<param name = "amcl/initial_pose_y" value="2.0" />
+			<param name = "amcl/base_frame_id" value="OmniPlatform002_base" />
+			
+		<node name="go_near_beacon" pkg="go_near_beacon" type="go_near_beacon" output="screen">
+			<param name="prefix" value ="/OmniPlatform002/"/>
+		</node>
+	 
+		<node name="deliver_order" pkg="deliver_order" type="deliver_order" output="screen">
+			<param name="prefix" value ="/OmniPlatform002/"/>
+		</node>
+
+		<node name="my_subsumption" pkg="my_subsumption" type="my_subsumption" output="screen" >
+			<param name="prefix" value ="/OmniPlatform002/"/>
+		</node>    
+
+	</group>
+
+ 	<node name="order" pkg="order" type="order" output="screen"/>
+
+   <node name="pick_up_order" pkg="pick_up_order" type="pick_up_order" output="screen" />
+
+
+</launch>
